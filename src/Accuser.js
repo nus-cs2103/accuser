@@ -31,6 +31,16 @@ Accuser.prototype.accuse = function(repository, issue, usernames) {
   });
 };
 
+Accuser.prototype.requestReviewers = function(repository, pr, reviewers) {
+  var self = this;
+  self.github.pullRequests.createReviewRequest({
+    user: repository.user,
+    repo: repository.repo,
+    number: pr.number,
+    reviewers: reviewers.constructor == Array ? reviewers : [reviewers]
+  });
+};
+
 Accuser.prototype.comment = function(repository, issue, comment) {
   var self = this;
   self.github.issues.createComment({

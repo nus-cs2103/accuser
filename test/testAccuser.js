@@ -87,6 +87,47 @@ describe("Accuser", function() {
     next();
   });
 
+  it("should request reviewers based on a pr object and username", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+
+    accuser.github = {
+      pullRequests: {
+        createReviewRequest: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.reviewers[0] === "mauris");
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.pullRequests);
+    mock.expects("createReviewRequest").once();
+    accuser.requestReviewers(repository, sampleIssue, "mauris");
+    mock.verify();
+    next();
+  });
+
+  it("should request reviewers based on a pr object and multiple usernames", function(next) {
+    var repository = accuser.addRepository("mauris", "accuser");
+
+    accuser.github = {
+      pullRequests: {
+        createReviewRequest: function(obj) {
+          assert(obj.repo === repository.repo);
+          assert(obj.user === repository.user);
+          assert(obj.number === sampleIssue.number);
+          assert(obj.reviewers[0] === "mauris");
+          assert(obj.reviewers[1] === "octocat");
+        }
+      }
+    };
+    var mock = sinon.mock(accuser.github.pullRequests);
+    mock.expects("createReviewRequest").once();
+    accuser.requestReviewers(repository, sampleIssue, ["mauris", "octocat"]);
+    mock.verify();
+    next();
+  });
+
   it("should add a comment to an issue", function(next) {
     var repository = accuser.addRepository("mauris", "accuser");
 
