@@ -4,7 +4,7 @@
   Code licensed under MIT License.
  */
 
-var GitHubApi = require("github");
+var GitHubApi = require("@octokit/rest");
 var Promise = require('bluebird');
 var Repository = require("./Repository");
 

@@ -23,8 +23,8 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "bluebird": "^3.4.1",
-    "github": "^11.0.0"
+    "bluebird": "^3.5.1",
+    "@octokit/rest": "^15.9.4"
   },
   "devDependencies": {
     "mocha": "^3.0.2",
