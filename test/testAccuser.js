@@ -102,7 +102,7 @@ describe("Accuser", function() {
     };
     var mock = sinon.mock(accuser.github.pullRequests);
     mock.expects("createReviewRequest").once();
-    accuser.requestReviewers(repository, sampleIssue, "mauris");
+    accuser.requestReview(repository, sampleIssue, "mauris");
     mock.verify();
     next();
   });
@@ -123,7 +123,7 @@ describe("Accuser", function() {
     };
     var mock = sinon.mock(accuser.github.pullRequests);
     mock.expects("createReviewRequest").once();
-    accuser.requestReviewers(repository, sampleIssue, ["mauris", "octocat"]);
+    accuser.requestReview(repository, sampleIssue, ["mauris", "octocat"]);
     mock.verify();
     next();
   });
@@ -285,7 +285,7 @@ describe("Accuser", function() {
     };
     var mock = sinon.mock(accuser.github.issues);
     mock.expects("getForRepo").once().returns(new Promise(function(resolve, reject){
-      resolve([sampleIssue]);
+      resolve({ data: [sampleIssue] });
     }));
 
     accuser.tick()
