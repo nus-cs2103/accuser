@@ -1,4 +1,4 @@
-# Accuser [![Build Status](https://travis-ci.org/mauris/accuser.svg?branch=master)](https://travis-ci.org/mauris/accuser)
+# Accuser [![Build Status](https://travis-ci.org/nus-cs2103/accuser.svg?branch=master)](https://travis-ci.org/nus-cs2103/accuser)
 
 Accuser is a lightweight framework that lets you write Github bots that monitor issues and pull requests and work with them.
 
