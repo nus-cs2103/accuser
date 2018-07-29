@@ -6,21 +6,25 @@
   "scripts": {
     "test": "mocha"
   },
-  "author": "Sam Yong <mauris@hotmail.sg>",
+  "author": "CS2103 Team <cs2103@comp.nus.edu.sg>",
   "contributors": [
+    {
+      "name": "Louis Lai",
+      "email": "hoangdung2506@gmail.com"
+    },
     {
       "name": "Sam Yong",
       "email": "mauris@hotmail.sg"
     }
   ],
-  "homepage": "https://github.com/mauris/accuser",
+  "homepage": "https://github.com/nus-cs2103/accuser",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mauris/accuser.git"
+    "url": "https://github.com/nus-cs2103/accuser.git"
   },
   "license": "MIT",
   "engine": {
-    "node": ">=0.10.0"
+    "node": ">=5.0.0"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
