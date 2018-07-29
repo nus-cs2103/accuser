@@ -24,17 +24,17 @@ Accuser.prototype.authenticate = function(config) {
 Accuser.prototype.accuse = function(repository, issue, usernames) {
   var self = this;
   self.github.issues.addAssigneesToIssue({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: issue.number,
     assignees: usernames.constructor == Array ? usernames : [usernames]
   });
 };
 
-Accuser.prototype.requestReviewers = function(repository, pr, reviewers) {
+Accuser.prototype.requestReview = function(repository, pr, reviewers) {
   var self = this;
   self.github.pullRequests.createReviewRequest({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: pr.number,
     reviewers: reviewers.constructor == Array ? reviewers : [reviewers]
@@ -44,7 +44,7 @@ Accuser.prototype.requestReviewers = function(repository, pr, reviewers) {
 Accuser.prototype.comment = function(repository, issue, comment) {
   var self = this;
   self.github.issues.createComment({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: issue.number,
     body: comment
@@ -54,17 +54,17 @@ Accuser.prototype.comment = function(repository, issue, comment) {
 Accuser.prototype.addLabels = function(repository, issue, labels) {
   var self = this;
   self.github.issues.addLabels({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: issue.number,
-    body: labels.constructor == Array ? labels : [labels]
+    labels: labels.constructor == Array ? labels : [labels]
   });
 };
 
 Accuser.prototype.removeLabel = function(repository, issue, label) {
   var self = this;
   self.github.issues.removeLabel({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: issue.number,
     name: label
@@ -74,7 +74,7 @@ Accuser.prototype.removeLabel = function(repository, issue, label) {
 Accuser.prototype.open = function(repository, issue) {
   var self = this;
   self.github.issues.edit({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: issue.number,
     state: 'open'
@@ -84,7 +84,7 @@ Accuser.prototype.open = function(repository, issue) {
 Accuser.prototype.close = function(repository, issue) {
   var self = this;
   self.github.issues.edit({
-    user: repository.user,
+    owner: repository.user,
     repo: repository.repo,
     number: issue.number,
     state: 'closed'
@@ -101,7 +101,7 @@ Accuser.prototype.addRepository = function(user, repo) {
 var runWorkers = function(repository, prList) {
   // the list is now done, run all workers
   repository.workers.forEach(function(worker){
-    prList.forEach(function(pr){
+    prList.data.forEach(function(pr){
       var activateWorker = true;
       worker.filters.forEach(function(filter){
         activateWorker = activateWorker && filter(repository, pr);
@@ -142,7 +142,7 @@ Accuser.prototype.tick = function(filters) {
 
   self.repos.forEach(function(repository) {
     var repoPromise = new Promise(function(resolve, reject){
-      filters.user = repository.user;
+      filters.owner = repository.user;
       filters.repo = repository.repo;
       self.github.issues
         .getForRepo(filters)
