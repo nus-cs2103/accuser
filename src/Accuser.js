@@ -5,7 +5,6 @@
  */
 
 var GitHubApi = require("@octokit/rest");
-var Promise = require('bluebird');
 var Repository = require("./Repository");
 
 var Accuser = function (options) {
@@ -13,7 +12,6 @@ var Accuser = function (options) {
   this.workers = [];
   this.repos = [];
   this.interval = options.interval || 300000;
-  options.Promise = Promise;
   this.github = new GitHubApi(options);
 };
 

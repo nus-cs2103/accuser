@@ -1,6 +1,5 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var Promise = require('bluebird');
 var Accuser = require('../');
 
 describe("Accuser", function() {
