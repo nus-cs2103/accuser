@@ -105,3 +105,6 @@ $RECYCLE.BIN/
 .Trash-*
 
 testAuth.json
+
+# IntelliJ IDEA
+.idea/

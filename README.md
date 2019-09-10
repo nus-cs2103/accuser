@@ -17,6 +17,8 @@ To use Accuser, installed Accuser to your application/project via npm:
 npm install --save accuser
 ```
 
+Notice: your Node.js version should be greater or equal to `6.0`.
+
 ## Future Implementation
 
 - [ ] Webhook / Event Implementation
