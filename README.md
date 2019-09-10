@@ -1,8 +1,8 @@
-# Accuser [![Build Status](https://travis-ci.org/nus-cs2103/accuser.svg?branch=master)](https://travis-ci.org/nus-cs2103/accuser)
+# Accuser
 
-Accuser is a lightweight framework that lets you write Github bots that monitor issues and pull requests and work with them.
+[![Build Status](https://travis-ci.org/nus-cs2103/accuser.svg?branch=master)](https://travis-ci.org/nus-cs2103/accuser)
 
-The framework wraps around the [node-github](https://github.com/mikedeboer/node-github) library to make it easier to monitor pull requests, assign people and write comments.
+Accuser is a lightweight framework that lets you write Github bots that monitor issues and pull requests and work with them. The framework wraps around the [octokit](https://github.com/octokit/rest.js) library to make it easier to monitor pull requests, assign people and write comments.
 
 - [x] Issues and Pull Requests filtering
 - [x] Accuse / Assigning PRs
@@ -13,7 +13,9 @@ The framework wraps around the [node-github](https://github.com/mikedeboer/node-
 
 To use Accuser, installed Accuser to your application/project via npm:
 
-    npm install --save accuser
+```bash
+npm install --save accuser
+```
 
 ## Future Implementation
 
@@ -24,7 +26,16 @@ To use Accuser, installed Accuser to your application/project via npm:
 
 Accuser uses Mocha for unit testing. Ensure that development dependencies are installed and run the following command:
 
-    npm test
+```bash
+npm test
+```
+
+## Release Process
+
+- Make sure all your code changes have been merged into the `master` branch via [pull requests](https://github.com/nus-cs2103/accuser/pulls) **(preferred)**, direct commits, etc.
+- Update the `version` defined in [`package.json`](package.json). Please use [semantic versioning](https://semver.org).
+- Create a new [release](https://github.com/nus-cs2103/accuser/releases/new) using the new `version` you defined just now.
+- Ask any project member with required privileges to sync the `release` branch with the `master` branch _(a Git rebase may be needed)_.
 
 ## License
 
