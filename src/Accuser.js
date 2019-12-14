@@ -4,8 +4,8 @@
   Code licensed under MIT License.
  */
 
-var GitHubApi = require("@octokit/rest");
-var Repository = require("./Repository");
+var GitHubApi = require('@octokit/rest');
+var Repository = require('./Repository');
 
 class Accuser {
   constructor(options) {
@@ -26,7 +26,7 @@ class Accuser {
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
-      assignees: usernames.constructor == Array ? usernames : [usernames]
+      assignees: usernames.constructor === Array ? usernames : [usernames]
     });
   }
 
@@ -36,7 +36,7 @@ class Accuser {
       owner: repository.user,
       repo: repository.repo,
       number: pr.number,
-      reviewers: reviewers.constructor == Array ? reviewers : [reviewers]
+      reviewers: reviewers.constructor === Array ? reviewers : [reviewers]
     });
   }
 
@@ -56,7 +56,7 @@ class Accuser {
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
-      labels: labels.constructor == Array ? labels : [labels]
+      labels: labels.constructor === Array ? labels : [labels]
     });
   }
 
@@ -106,7 +106,7 @@ class Accuser {
     filters.assignee = filters.assignee || '*';
 
     self.repos.forEach(function(repository) {
-      var repoPromise = new Promise(function(resolve, reject){
+      var repoPromise = new Promise(function(resolve, reject) {
         filters.owner = repository.user;
         filters.repo = repository.repo;
         self.github.issues
@@ -122,7 +122,6 @@ class Accuser {
 
   run(filters) {
     var self = this;
-    var github = self.github;
 
     filters = filters || {};
 
@@ -140,38 +139,41 @@ class Accuser {
   }
 }
 
-var runWorkers = function(repository, prList) {
+function runWorkers(repository, prList) {
   // the list is now done, run all workers
-  repository.workers.forEach(function(worker){
-    prList.data.forEach(function(pr){
-      var activateWorker = true;
-      worker.filters.forEach(function(filter){
+  repository.workers.forEach(worker => {
+    prList.data.forEach(pr => {
+      let activateWorker = true;
+      worker.filters.forEach(filter => {
         activateWorker = activateWorker && filter(repository, pr);
       });
+
       if (activateWorker) {
-        worker.do.forEach(function(doCallback){
+        worker.do.forEach(doCallback => {
           doCallback(repository, pr);
         });
       }
     });
   });
-};
+}
 
-var createResponseCallback = function(github, resolve, repository) {
-  return function(result) {
+function createResponseCallback(github, resolve, repository) {
+  return result => {
     runWorkers(repository, result);
-    if (github.hasNextPage(result)) {
-      github.getNextPage(result, function(err, res){
-        var callback = createResponseCallback(github, resolve, repository);
-        if (err === null) {
-          callback(res);
-        }
-      });
-    } else {
-      // done with all paginations
+
+    // Stop if already done with all pages.
+    if (!github.hasNextPage(result)) {
       resolve();
+      return;
     }
+
+    github.getNextPage(result, (err, res) => {
+      const callback = createResponseCallback(github, resolve, repository);
+      if (err === null) {
+        callback(res);
+      }
+    });
   };
-};
+}
 
 module.exports = Accuser;

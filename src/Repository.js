@@ -12,17 +12,18 @@ class Repository {
       'do': []
     };
     self.workers.push(worker);
-    var workerChainer = {
-      "filter": function(filterCallback) {
+
+    const workerChain = {
+      'filter': filterCallback => {
         worker.filters.push(filterCallback);
-        return workerChainer;
+        return workerChain;
       },
-      "do": function(doCallback) {
+      'do': doCallback => {
         worker.do.push(doCallback);
-        return workerChainer;
+        return workerChain;
       }
     };
-    return workerChainer;
+    return workerChain;
   }
 }
 
