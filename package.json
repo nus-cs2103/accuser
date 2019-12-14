@@ -4,6 +4,7 @@
   "description": "A Github Pull Request bot for assigning people to pull requests",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint src ./index.js",
     "test": "mocha"
   },
   "author": "CS2103 Team <cs2103@comp.nus.edu.sg>",
@@ -30,12 +31,15 @@
   },
   "license": "MIT",
   "engine": {
-    "node": ">=6.0.0"
+    "node": ">=8.10.0"
   },
   "dependencies": {
     "@octokit/rest": "^15.9.5"
   },
   "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.19.1",
     "mocha": "^3.0.2",
     "sinon": "^6.1.5"
   }
