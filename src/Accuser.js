@@ -7,94 +7,138 @@
 var GitHubApi = require("@octokit/rest");
 var Repository = require("./Repository");
 
-var Accuser = function (options) {
-  options = options || {};
-  this.workers = [];
-  this.repos = [];
-  this.interval = options.interval || 300000;
-  this.github = new GitHubApi(options);
-};
+class Accuser {
+  constructor(options) {
+    options = options || {};
+    this.workers = [];
+    this.repos = [];
+    this.interval = options.interval || 300000;
+    this.github = new GitHubApi(options);
+  }
 
-Accuser.prototype.authenticate = function(config) {
-  return this.github.authenticate(config);
-};
+  authenticate(config) {
+    return this.github.authenticate(config);
+  }
 
-Accuser.prototype.accuse = function(repository, issue, usernames) {
-  var self = this;
-  self.github.issues.addAssigneesToIssue({
-    owner: repository.user,
-    repo: repository.repo,
-    number: issue.number,
-    assignees: usernames.constructor == Array ? usernames : [usernames]
-  });
-};
+  accuse(repository, issue, usernames) {
+    var self = this;
+    self.github.issues.addAssigneesToIssue({
+      owner: repository.user,
+      repo: repository.repo,
+      number: issue.number,
+      assignees: usernames.constructor == Array ? usernames : [usernames]
+    });
+  }
 
-Accuser.prototype.requestReview = function(repository, pr, reviewers) {
-  var self = this;
-  self.github.pullRequests.createReviewRequest({
-    owner: repository.user,
-    repo: repository.repo,
-    number: pr.number,
-    reviewers: reviewers.constructor == Array ? reviewers : [reviewers]
-  });
-};
+  requestReview(repository, pr, reviewers) {
+    var self = this;
+    self.github.pullRequests.createReviewRequest({
+      owner: repository.user,
+      repo: repository.repo,
+      number: pr.number,
+      reviewers: reviewers.constructor == Array ? reviewers : [reviewers]
+    });
+  }
 
-Accuser.prototype.comment = function(repository, issue, comment) {
-  var self = this;
-  self.github.issues.createComment({
-    owner: repository.user,
-    repo: repository.repo,
-    number: issue.number,
-    body: comment
-  });
-};
+  comment(repository, issue, comment) {
+    var self = this;
+    self.github.issues.createComment({
+      owner: repository.user,
+      repo: repository.repo,
+      number: issue.number,
+      body: comment
+    });
+  }
 
-Accuser.prototype.addLabels = function(repository, issue, labels) {
-  var self = this;
-  self.github.issues.addLabels({
-    owner: repository.user,
-    repo: repository.repo,
-    number: issue.number,
-    labels: labels.constructor == Array ? labels : [labels]
-  });
-};
+  addLabels(repository, issue, labels) {
+    var self = this;
+    self.github.issues.addLabels({
+      owner: repository.user,
+      repo: repository.repo,
+      number: issue.number,
+      labels: labels.constructor == Array ? labels : [labels]
+    });
+  }
 
-Accuser.prototype.removeLabel = function(repository, issue, label) {
-  var self = this;
-  self.github.issues.removeLabel({
-    owner: repository.user,
-    repo: repository.repo,
-    number: issue.number,
-    name: label
-  });
-};
+  removeLabel(repository, issue, label) {
+    var self = this;
+    self.github.issues.removeLabel({
+      owner: repository.user,
+      repo: repository.repo,
+      number: issue.number,
+      name: label
+    });
+  }
 
-Accuser.prototype.open = function(repository, issue) {
-  var self = this;
-  self.github.issues.edit({
-    owner: repository.user,
-    repo: repository.repo,
-    number: issue.number,
-    state: 'open'
-  });
-};
+  open(repository, issue) {
+    var self = this;
+    self.github.issues.edit({
+      owner: repository.user,
+      repo: repository.repo,
+      number: issue.number,
+      state: 'open'
+    });
+  }
 
-Accuser.prototype.close = function(repository, issue) {
-  var self = this;
-  self.github.issues.edit({
-    owner: repository.user,
-    repo: repository.repo,
-    number: issue.number,
-    state: 'closed'
-  });
-};
+  close(repository, issue) {
+    var self = this;
+    self.github.issues.edit({
+      owner: repository.user,
+      repo: repository.repo,
+      number: issue.number,
+      state: 'closed'
+    });
+  }
 
-Accuser.prototype.addRepository = function(user, repo) {
-  var self = this;
-  var repository = new Repository(user, repo);
-  self.repos.push(repository);
-  return repository;
-};
+  addRepository(user, repo) {
+    var self = this;
+    var repository = new Repository(user, repo);
+    self.repos.push(repository);
+    return repository;
+  }
+
+  tick(filters) {
+    var self = this;
+    var promises = [];
+
+    filters = filters || {};
+    filters.state = filters.state || 'open';
+    filters.assignee = filters.assignee || '*';
+
+    self.repos.forEach(function(repository) {
+      var repoPromise = new Promise(function(resolve, reject){
+        filters.owner = repository.user;
+        filters.repo = repository.repo;
+        self.github.issues
+          .getForRepo(filters)
+          .then(createResponseCallback(self.github, resolve, repository));
+      });
+      promises.push(repoPromise);
+    });
+
+    return Promise
+      .all(promises);
+  }
+
+  run(filters) {
+    var self = this;
+    var github = self.github;
+
+    filters = filters || {};
+
+    var tickInterval = function() {
+      self.tick(filters)
+        .then(function() {
+          setTimeout(tickInterval, self.interval);
+        });
+    };
+
+    self.tick(filters)
+      .then(function() {
+        setTimeout(tickInterval, self.interval);
+      });
+  }
+}
 
 var runWorkers = function(repository, prList) {
   // the list is now done, run all workers
@@ -128,48 +172,6 @@ var createResponseCallback = function(github, resolve, repository) {
       resolve();
     }
   };
-};
-
-Accuser.prototype.tick = function(filters) {
-  var self = this;
-  var promises = [];
-
-  filters = filters || {};
-  filters.state = filters.state || 'open';
-  filters.assignee = filters.assignee || '*';
-
-  self.repos.forEach(function(repository) {
-    var repoPromise = new Promise(function(resolve, reject){
-      filters.owner = repository.user;
-      filters.repo = repository.repo;
-      self.github.issues
-        .getForRepo(filters)
-        .then(createResponseCallback(self.github, resolve, repository));
-    });
-    promises.push(repoPromise);
-  });
-
-  return Promise
-    .all(promises);
-};
-
-Accuser.prototype.run = function(filters) {
-  var self = this;
-  var github = self.github;
-
-  filters = filters || {};
-
-  var tickInterval = function() {
-    self.tick(filters)
-      .then(function() {
-        setTimeout(tickInterval, self.interval);
-      });
-  };
-
-  self.tick(filters)
-    .then(function() {
-      setTimeout(tickInterval, self.interval);
-    });
 };
 
 module.exports = Accuser;
