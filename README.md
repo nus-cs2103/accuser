@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/nus-cs2103/accuser.svg?branch=master)](https://travis-ci.org/nus-cs2103/accuser)
 
-Accuser is a lightweight framework that lets you write Github bots that monitor issues and pull requests and work with them. The framework wraps around the [octokit](https://github.com/octokit/rest.js) library to make it easier to monitor pull requests, assign people and write comments.
+Accuser is a lightweight framework to help you write Github bots that monitor issues and pull requests and work with them. The framework wraps around the [octokit](https://github.com/octokit/rest.js) library to make it easier to monitor pull requests, assign people and write comments.
 
 - [x] Issues and Pull Requests filtering
 - [x] Accuse / Assigning PRs
@@ -21,18 +21,17 @@ Notice: your Node.js version should be greater or equal to `6.0`.
 
 ## Future Implementation
 
-- [ ] Webhook / Event Implementation
+- [ ] Webhooks / Event Implementation
 - [ ] Renaming Title
 
 ## Testing
 
-Accuser uses Mocha for unit testing. Ensure that development dependencies are installed and run the following command:
+Accuser uses Mocha for unit testing. To perform testing:
 
-```bash
-npm test
-```
+- Ensure that development dependencies are installed.
+- Run the following command `npm test`.
 
-## Release Process
+## Contributing
 
 - Make sure all your code changes have been merged into the `master` branch via [pull requests](https://github.com/nus-cs2103/accuser/pulls) **(preferred)**, direct commits, etc.
 - Update the `version` defined in [`package.json`](package.json). Please use [semantic versioning](https://semver.org).
@@ -41,4 +40,4 @@ npm test
 
 ## License
 
-Code released under the MIT license.
+[MIT License](LICENSE)

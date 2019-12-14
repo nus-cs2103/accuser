@@ -9,12 +9,18 @@
   "author": "CS2103 Team <cs2103@comp.nus.edu.sg>",
   "contributors": [
     {
+      "name": "Yunpeng Niu",
+      "email": "neilniuyunpeng@gmail.com",
+      "url": "https://yunpengn.github.io/"
+    },
+    {
       "name": "Louis Lai",
       "email": "hoangdung2506@gmail.com"
     },
     {
       "name": "Sam Yong",
-      "email": "mauris@hotmail.sg"
+      "email": "mauris@hotmail.sg",
+      "url": "http://mauris.sg/"
     }
   ],
   "homepage": "https://github.com/nus-cs2103/accuser",
