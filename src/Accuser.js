@@ -151,14 +151,14 @@ class Accuser {
     return Promise.all(promises);
   }
 
-  run(filters = {}) {
+  run(filters = {}, type = 'issues') {
     var self = this;
 
     const tickInterval = () => {
-      self.tick(filters)
+      self.tick(filters, type)
         .then(() => setTimeout(tickInterval, self.interval));
     };
-    self.tick(filters)
+    self.tick(filters, type)
       .then(() => setTimeout(tickInterval, self.interval));
   }
 }
