@@ -271,23 +271,18 @@ describe("Accuser", function() {
       .do(workerDo);
 
     accuser.github = {
-      issues: {
-        listForRepo: function(obj) {
-          return new Promise(function(resolve, reject){
-            resolve([sampleIssue]);
-          })
-        }
-      },
-      hasNextPage: function() {
-        return false
+      paginate: obj => {
+        return new Promise(function(resolve, reject) {
+          resolve([sampleIssue]);
+        });
       }
     };
-    var mock = sinon.mock(accuser.github.issues);
-    mock.expects("listForRepo").once().returns(new Promise(function(resolve, reject){
+    var mock = sinon.mock(accuser.github);
+    mock.expects("paginate").once().returns(new Promise(function(resolve, reject) {
       resolve({ data: [sampleIssue] });
     }));
 
-    accuser.tick()
+    accuser.tick({}, 'others')
       .then(function(){
         assert(filterSpy.calledOnce);
         assert(doSpy.calledOnce);

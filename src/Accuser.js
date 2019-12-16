@@ -96,41 +96,21 @@ class Accuser {
     return repository;
   }
 
-  static runWorkers(repository, prList) {
-    // the list is now done, run all workers
+  static runWorkers(repository, result) {
     repository.workers.forEach(worker => {
-      prList.data.forEach(pr => {
+      result.data.forEach(item => {
         let activateWorker = true;
         worker.filters.forEach(filter => {
-          activateWorker = activateWorker && filter(repository, pr);
+          activateWorker = activateWorker && filter(repository, item);
         });
 
         if (activateWorker) {
           worker.do.forEach(doCallback => {
-            doCallback(repository, pr);
+            doCallback(repository, item);
           });
         }
       });
     });
-  }
-
-  static createResponseCallback(github, resolve, repository) {
-    return result => {
-      Accuser.runWorkers(repository, result);
-
-      // Stop if already done with all pages.
-      if (!github.hasNextPage(result)) {
-        resolve();
-        return;
-      }
-
-      github.getNextPage(result, (err, res) => {
-        const callback = Accuser.createResponseCallback(github, resolve, repository);
-        if (err === null) {
-          callback(res);
-        }
-      });
-    };
   }
 
   tick(filters = {}, type = 'issues') {
@@ -139,26 +119,31 @@ class Accuser {
 
     self.repos.forEach(repository => {
       const repoPromise = new Promise(resolve => {
-        const params = {
+        // Some parameters common to all types.
+        let params = {
           owner: repository.user,
           repo: repository.repo,
           state: filters.state || 'open'
         };
-        const callback = Accuser.createResponseCallback(self.github, resolve, repository);
 
+        // Switches endpoint (and additional parameters) based on the type of items being queried.
         switch (type) {
           case 'issues':
             params.assignee = filters.assignee || '*';
-            self.github.issues.listForRepo(params)
-              .then(callback);
+            params = self.github.issues.listForRepo.endpoint.merge(params);
             break;
           case 'pulls':
-            self.github.pulls.list(params)
-              .then(callback);
+            params = self.github.pulls.list.endpoint.merge(params);
             break;
           default:
             console.log('Unable to handle this type: ' + type);
         }
+
+        // Uses paginate helper method to receive items across all pages.
+        self.github.paginate(params).then(result => {
+          Accuser.runWorkers(repository, result);
+          resolve();
+        });
       });
       promises.push(repoPromise);
     });
