@@ -8,8 +8,7 @@ const GitHubAPI = require('@octokit/rest');
 const Repository = require('./Repository');
 
 class Accuser {
-  constructor(options) {
-    options = options || {};
+  constructor(options = {}) {
     this.workers = [];
     this.repos = [];
     this.interval = options.interval || 300000;
@@ -106,7 +105,7 @@ class Accuser {
         const params = {
           owner: repository.user,
           repo: repository.repo,
-          state: filters.state || 'open',
+          state: filters.state || 'open'
         };
         const callback = createResponseCallback(self.github, resolve, repository);
 
@@ -128,10 +127,8 @@ class Accuser {
     return Promise.all(promises);
   }
 
-  run(filters) {
+  run(filters = {}) {
     var self = this;
-
-    filters = filters || {};
 
     const tickInterval = () => {
       self.tick(filters).then(() => setTimeout(tickInterval, self.interval));
