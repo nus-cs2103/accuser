@@ -34,7 +34,7 @@
     "node": ">=8.10.0"
   },
   "dependencies": {
-    "@octokit/rest": "^15.9.5"
+    "@octokit/rest": "^16.35.2"
   },
   "devDependencies": {
     "eslint": "^6.1.0",

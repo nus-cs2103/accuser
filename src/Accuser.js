@@ -4,8 +4,8 @@
   Code licensed under MIT License.
  */
 
-var GitHubApi = require('@octokit/rest');
-var Repository = require('./Repository');
+const GitHubAPI = require('@octokit/rest');
+const Repository = require('./Repository');
 
 class Accuser {
   constructor(options) {
@@ -13,7 +13,7 @@ class Accuser {
     this.workers = [];
     this.repos = [];
     this.interval = options.interval || 300000;
-    this.github = new GitHubApi(options);
+    this.github = new GitHubAPI(options);
   }
 
   authenticate(config) {
@@ -22,7 +22,7 @@ class Accuser {
 
   accuse(repository, issue, usernames) {
     var self = this;
-    self.github.issues.addAssigneesToIssue({
+    self.github.issues.addAssignees({
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
@@ -36,7 +36,7 @@ class Accuser {
       owner: repository.user,
       repo: repository.repo,
       number: pr.number,
-      reviewers: reviewers.constructor === Array ? reviewers : [reviewers]
+      reviewers: Array.isArray(reviewers) ? reviewers : [reviewers]
     });
   }
 
@@ -56,7 +56,7 @@ class Accuser {
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
-      labels: labels.constructor === Array ? labels : [labels]
+      labels: Array.isArray(labels) ? labels : [labels]
     });
   }
 
@@ -72,7 +72,7 @@ class Accuser {
 
   open(repository, issue) {
     var self = this;
-    self.github.issues.edit({
+    self.github.issues.update({
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
@@ -82,7 +82,7 @@ class Accuser {
 
   close(repository, issue) {
     var self = this;
-    self.github.issues.edit({
+    self.github.issues.update({
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
@@ -97,22 +97,30 @@ class Accuser {
     return repository;
   }
 
-  tick(filters) {
+  tick(filters = {}, type = 'issues') {
     var self = this;
     var promises = [];
 
-    filters = filters || {};
-    filters.state = filters.state || 'open';
-    filters.assignee = filters.assignee || '*';
-
     self.repos.forEach(repository => {
       const repoPromise = new Promise((resolve, reject) => {
-        filters.owner = repository.user;
-        filters.repo = repository.repo;
+        const params = {
+          owner: repository.user,
+          repo: repository.repo,
+          state: filters.state || 'open',
+        };
+        const callback = createResponseCallback(self.github, resolve, repository);
 
-        self.github.issues
-          .getForRepo(filters)
-          .then(createResponseCallback(self.github, resolve, repository));
+        switch (type) {
+          case 'issues':
+            params.assignee = filters.assignee || '*';
+            self.github.issues.listForRepo(params).then(callback);
+            break;
+          case 'pulls':
+            self.github.pulls.list(params).then(callback);
+            break;
+          default:
+            console.log('Unable to handle this type: ' + type);
+        }
       });
       promises.push(repoPromise);
     });

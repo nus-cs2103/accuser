@@ -50,7 +50,7 @@ describe("Accuser", function() {
 
     accuser.github = {
       issues: {
-        addAssigneesToIssue: function(obj) {
+        addAssignees: function(obj) {
           assert(obj.repo === repository.repo);
           assert(obj.user === repository.user);
           assert(obj.number === sampleIssue.number);
@@ -59,7 +59,7 @@ describe("Accuser", function() {
       }
     };
     var mock = sinon.mock(accuser.github.issues);
-    mock.expects("addAssigneesToIssue").once();
+    mock.expects("addAssignees").once();
     accuser.accuse(repository, sampleIssue, "mauris");
     mock.verify();
     next();
@@ -70,7 +70,7 @@ describe("Accuser", function() {
 
     accuser.github = {
       issues: {
-        addAssigneesToIssue: function(obj) {
+        addAssignees: function(obj) {
           assert(obj.repo === repository.repo);
           assert(obj.user === repository.user);
           assert(obj.number === sampleIssue.number);
@@ -80,7 +80,7 @@ describe("Accuser", function() {
       }
     };
     var mock = sinon.mock(accuser.github.issues);
-    mock.expects("addAssigneesToIssue").once();
+    mock.expects("addAssignees").once();
     accuser.accuse(repository, sampleIssue, ["mauris", "octocat"]);
     mock.verify();
     next();
@@ -171,7 +171,7 @@ describe("Accuser", function() {
     var repository = accuser.addRepository("mauris", "accuser");
     accuser.github = {
       issues: {
-        edit: function(obj) {
+        update: function(obj) {
           assert(obj.repo === repository.repo);
           assert(obj.user === repository.user);
           assert(obj.number === sampleIssue.number);
@@ -180,7 +180,7 @@ describe("Accuser", function() {
       }
     };
     var mock = sinon.mock(accuser.github.issues);
-    mock.expects("edit").once();
+    mock.expects("update").once();
     accuser.open(repository, sampleIssue);
     mock.verify();
     next();
@@ -190,7 +190,7 @@ describe("Accuser", function() {
     var repository = accuser.addRepository("mauris", "accuser");
     accuser.github = {
       issues: {
-        edit: function(obj) {
+        update: function(obj) {
           assert(obj.repo === repository.repo);
           assert(obj.user === repository.user);
           assert(obj.number === sampleIssue.number);
@@ -199,7 +199,7 @@ describe("Accuser", function() {
       }
     };
     var mock = sinon.mock(accuser.github.issues);
-    mock.expects("edit").once();
+    mock.expects("update").once();
     accuser.open(repository, sampleIssue);
     mock.verify();
     next();
@@ -272,7 +272,7 @@ describe("Accuser", function() {
 
     accuser.github = {
       issues: {
-        getForRepo: function(obj) {
+        listForRepo: function(obj) {
           return new Promise(function(resolve, reject){
             resolve([sampleIssue]);
           })
@@ -283,7 +283,7 @@ describe("Accuser", function() {
       }
     };
     var mock = sinon.mock(accuser.github.issues);
-    mock.expects("getForRepo").once().returns(new Promise(function(resolve, reject){
+    mock.expects("listForRepo").once().returns(new Promise(function(resolve, reject){
       resolve({ data: [sampleIssue] });
     }));
 
