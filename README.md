@@ -43,7 +43,10 @@ To include your changes in the next release:
 - Make sure all your code changes have been merged into the `master` branch via [pull requests](https://github.com/nus-cs2103/accuser/pulls) **(preferred)**, direct commits, etc.
 - Update the `version` defined in [`package.json`](package.json). Please use [semantic versioning](https://semver.org).
 - Create a new [release](https://github.com/nus-cs2103/accuser/releases/new) using the new `version` you defined just now.
-- Ask any project member with required privileges to sync the `release` branch with the `master` branch _(a Git rebase may be needed)_.
+- Ask any project member with required privileges to sync the `release` branch with the `master` branch
+	- To make the Git history clean, a Git rebase is preferred over merge.
+- Switch to the `release` branch and create a tag named as the new `version` you defined.
+- Push the changes (as well as the new tag) to GitHub.
 
 ## License
 
