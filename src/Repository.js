@@ -6,19 +6,19 @@ class Repository {
   }
 
   newWorker() {
-    var self = this;
-    var worker = {
-      'filters': [],
-      'do': []
+    const self = this;
+    const worker = {
+      filters: [],
+      do: []
     };
     self.workers.push(worker);
 
     const workerChain = {
-      'filter': filterCallback => {
+      filter: filterCallback => {
         worker.filters.push(filterCallback);
         return workerChain;
       },
-      'do': doCallback => {
+      do: doCallback => {
         worker.do.push(doCallback);
         return workerChain;
       }

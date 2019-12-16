@@ -105,10 +105,11 @@ class Accuser {
     filters.state = filters.state || 'open';
     filters.assignee = filters.assignee || '*';
 
-    self.repos.forEach(function(repository) {
-      var repoPromise = new Promise(function(resolve, reject) {
+    self.repos.forEach(repository => {
+      const repoPromise = new Promise((resolve, reject) => {
         filters.owner = repository.user;
         filters.repo = repository.repo;
+
         self.github.issues
           .getForRepo(filters)
           .then(createResponseCallback(self.github, resolve, repository));
@@ -116,8 +117,7 @@ class Accuser {
       promises.push(repoPromise);
     });
 
-    return Promise
-      .all(promises);
+    return Promise.all(promises);
   }
 
   run(filters) {
@@ -125,17 +125,10 @@ class Accuser {
 
     filters = filters || {};
 
-    var tickInterval = function() {
-      self.tick(filters)
-        .then(function() {
-          setTimeout(tickInterval, self.interval);
-        });
+    const tickInterval = () => {
+      self.tick(filters).then(() => setTimeout(tickInterval, self.interval));
     };
-
-    self.tick(filters)
-      .then(function() {
-        setTimeout(tickInterval, self.interval);
-      });
+    self.tick(filters).then(() => setTimeout(tickInterval, self.interval));
   }
 }
 
