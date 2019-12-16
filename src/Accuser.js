@@ -96,26 +96,65 @@ class Accuser {
     return repository;
   }
 
+  static runWorkers(repository, prList) {
+    // the list is now done, run all workers
+    repository.workers.forEach(worker => {
+      prList.data.forEach(pr => {
+        let activateWorker = true;
+        worker.filters.forEach(filter => {
+          activateWorker = activateWorker && filter(repository, pr);
+        });
+
+        if (activateWorker) {
+          worker.do.forEach(doCallback => {
+            doCallback(repository, pr);
+          });
+        }
+      });
+    });
+  }
+
+  static createResponseCallback(github, resolve, repository) {
+    return result => {
+      Accuser.runWorkers(repository, result);
+
+      // Stop if already done with all pages.
+      if (!github.hasNextPage(result)) {
+        resolve();
+        return;
+      }
+
+      github.getNextPage(result, (err, res) => {
+        const callback = Accuser.createResponseCallback(github, resolve, repository);
+        if (err === null) {
+          callback(res);
+        }
+      });
+    };
+  }
+
   tick(filters = {}, type = 'issues') {
     var self = this;
     var promises = [];
 
     self.repos.forEach(repository => {
-      const repoPromise = new Promise((resolve, reject) => {
+      const repoPromise = new Promise(resolve => {
         const params = {
           owner: repository.user,
           repo: repository.repo,
           state: filters.state || 'open'
         };
-        const callback = createResponseCallback(self.github, resolve, repository);
+        const callback = Accuser.createResponseCallback(self.github, resolve, repository);
 
         switch (type) {
           case 'issues':
             params.assignee = filters.assignee || '*';
-            self.github.issues.listForRepo(params).then(callback);
+            self.github.issues.listForRepo(params)
+              .then(callback);
             break;
           case 'pulls':
-            self.github.pulls.list(params).then(callback);
+            self.github.pulls.list(params)
+              .then(callback);
             break;
           default:
             console.log('Unable to handle this type: ' + type);
@@ -131,47 +170,12 @@ class Accuser {
     var self = this;
 
     const tickInterval = () => {
-      self.tick(filters).then(() => setTimeout(tickInterval, self.interval));
+      self.tick(filters)
+        .then(() => setTimeout(tickInterval, self.interval));
     };
-    self.tick(filters).then(() => setTimeout(tickInterval, self.interval));
+    self.tick(filters)
+      .then(() => setTimeout(tickInterval, self.interval));
   }
-}
-
-function runWorkers(repository, prList) {
-  // the list is now done, run all workers
-  repository.workers.forEach(worker => {
-    prList.data.forEach(pr => {
-      let activateWorker = true;
-      worker.filters.forEach(filter => {
-        activateWorker = activateWorker && filter(repository, pr);
-      });
-
-      if (activateWorker) {
-        worker.do.forEach(doCallback => {
-          doCallback(repository, pr);
-        });
-      }
-    });
-  });
-}
-
-function createResponseCallback(github, resolve, repository) {
-  return result => {
-    runWorkers(repository, result);
-
-    // Stop if already done with all pages.
-    if (!github.hasNextPage(result)) {
-      resolve();
-      return;
-    }
-
-    github.getNextPage(result, (err, res) => {
-      const callback = createResponseCallback(github, resolve, repository);
-      if (err === null) {
-        callback(res);
-      }
-    });
-  };
 }
 
 module.exports = Accuser;
