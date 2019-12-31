@@ -25,7 +25,7 @@ class Accuser {
       owner: repository.user,
       repo: repository.repo,
       number: issue.number,
-      assignees: usernames.constructor === Array ? usernames : [usernames]
+      assignees: Array.isArray(usernames.constructor) ? usernames : [usernames]
     });
   }
 
